@@ -1,0 +1,39 @@
+{
+  "realm": "gateway-realm",
+  "enabled": true,
+  "users": [
+    {
+      "username": "demouser",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "user@demo.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "demopassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["user"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Default user role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "gateway-client",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["*"],
+      "defaultRoles": ["user"]
+    }
+  ]
+}

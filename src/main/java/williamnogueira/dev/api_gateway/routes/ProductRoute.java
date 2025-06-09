@@ -2,10 +2,13 @@ package williamnogueira.dev.api_gateway.routes;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import williamnogueira.dev.api_gateway.utils.RouteUtils;
 
 import static williamnogueira.dev.api_gateway.utils.constants.RouteConstants.GATEWAY_HEADER;
@@ -18,6 +21,9 @@ public class ProductRoute {
     @Value("${uri}")
     private String uri;
 
+    private final KeyResolver forwardedKeyResolver;
+    private final RedisRateLimiter redisRateLimiter;
+
     private static final String ROUTE_NAME = "product";
 
     @Bean
@@ -28,6 +34,10 @@ public class ProductRoute {
                 .route(routeId, r -> r
                         .path(RouteUtils.routePath(ROUTE_NAME))
                         .filters(f -> f
+                                .requestRateLimiter(rl -> {
+                                    rl.setKeyResolver(forwardedKeyResolver);
+                                    rl.setRateLimiter(redisRateLimiter);
+                                })
                                 .circuitBreaker(cb -> {
                                     cb.setName(ROUTE_NAME);
                                     cb.setRouteId(routeId);

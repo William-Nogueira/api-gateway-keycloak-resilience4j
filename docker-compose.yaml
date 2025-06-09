@@ -13,6 +13,11 @@ services:
       - "5432:5432"
     networks:
       - backend-network
+    healthcheck:
+        test: [ "CMD", "pg_isready", "-U", "keycloak" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
   keycloak:
     image: keycloak/keycloak:latest
@@ -31,7 +36,8 @@ services:
     volumes:
       - ./realm.json:/opt/keycloak/data/import/realm.json
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - backend-network
 
