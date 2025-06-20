@@ -16,7 +16,7 @@ import static williamnogueira.dev.api_gateway.utils.constants.RouteConstants.SER
 @Configuration
 public class PaymentRoute {
 
-    @Value("${uri}")
+    @Value("${simple-uri}")
     private String uri;
 
     private static final String ROUTE_NAME = "payment";
@@ -28,7 +28,7 @@ public class PaymentRoute {
                 .route(routeId, r -> r
                         .path(RouteUtils.routePath(ROUTE_NAME))
                         .filters(f -> f
-                                .circuitBreaker(cb -> {
+                                .circuitBreaker(cb -> { // Circuit Breaker + Fallback
                                     cb.setName(ROUTE_NAME);
                                     cb.setRouteId(routeId);
                                     cb.setStatusCodes(Set.of(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value())));
@@ -36,7 +36,7 @@ public class PaymentRoute {
                                 })
                                 .addRequestHeader(GATEWAY_HEADER, ROUTE_NAME)
                                 .rewritePath("/payment","/http/503")) // Server error for demo purposes
-                        .uri(uri))
+                        .uri(uri)) // Simple URI without load balancing
                 .build();
     }
 }
